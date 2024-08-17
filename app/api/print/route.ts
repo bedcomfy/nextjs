@@ -45,6 +45,10 @@ PRINT
     }
   } catch (error) {
     console.error('Error sending print job:', error);
-    return NextResponse.json({ message: 'Error sending print job', error: error.message }, { status: 500 });
+    if (error instanceof Error) {
+      return NextResponse.json({ message: 'Error sending print job', error: error.message }, { status: 500 });
+    } else {
+      return NextResponse.json({ message: 'Error sending print job', error: String(error) }, { status: 500 });
+    }
   }
 }
