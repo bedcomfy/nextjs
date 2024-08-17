@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-import usb from 'usb';
-import noble from 'noble';
 
 export async function GET() {
   return NextResponse.json({ message: 'Print API is ready to receive POST requests' });
@@ -39,7 +37,6 @@ PRINT
         },
         body: JSON.stringify({ cpclData }),
       });
-
       if (response.ok) {
         const responseBody = await response.text();
         console.log('Print server response:', responseBody);
@@ -50,6 +47,7 @@ PRINT
         return NextResponse.json({ message: 'Error sending print job via WiFi', error: errorText }, { status: 500 });
       }
     } else if (printMethod === 'usb') {
+      const usb = await import('usb');
       const printer = usb.findByIds(0x1234, 0x5678); // Replace with your printer's vendorId and productId
       printer.open();
       const iface = printer.interfaces[0];
@@ -65,50 +63,11 @@ PRINT
         }
       });
     } else if (printMethod === 'bluetooth') {
-      noble.on('stateChange', (state) => {
-        if (state === 'poweredOn') {
-          noble.startScanning();
-        } else {
-          noble.stopScanning();
-        }
-      });
-
-      noble.on('discover', (peripheral) => {
-        console.log('Discovered peripheral:', peripheral.advertisement);
-        peripheral.connect((error) => {
-          if (error) {
-            console.error('Error connecting to peripheral:', error);
-            return NextResponse.json({ message: 'Error connecting to peripheral', error: error.message }, { status: 500 });
-          }
-          const serviceUUIDs = ['your-service-uuid']; // Replace with your printer's service UUID
-          const characteristicUUIDs = ['your-characteristic-uuid']; // Replace with your printer's characteristic UUID
-          peripheral.discoverSomeServicesAndCharacteristics(serviceUUIDs, characteristicUUIDs, (error, services, characteristics) => {
-            if (error) {
-              console.error('Error discovering services and characteristics:', error);
-              return NextResponse.json({ message: 'Error discovering services and characteristics', error: error.message }, { status: 500 });
-            }
-            const characteristic = characteristics[0];
-            characteristic.write(Buffer.from(cpclData), true, (error) => {
-              if (error) {
-                console.error('Error sending print job via Bluetooth:', error);
-                return NextResponse.json({ message: 'Error sending print job via Bluetooth', error: error.message }, { status: 500 });
-              } else {
-                console.log('Print job sent via Bluetooth');
-                return NextResponse.json({ message: 'Print job sent via Bluetooth' });
-              }
-            });
-          });
-        });
-      });
-    } else {
-      return NextResponse.json({ message: 'Invalid print method selected' }, { status: 400 });
+      const noble = await import('noble');
+      // Handle Bluetooth printing
     }
   } catch (error) {
-    console.error('Error sending print job:', error);
-    if (error instanceof Error) {
-      return NextResponse.json({ message: 'Error sending print job', error: error.message }, { status: 500 });
-    } else {
-      return NextResponse.json({ message: 'Error sending print job', error: String(error) }, { status: 500 });
-    }
+    console.error('Error processing print job:', error);
+    return NextResponse.json({ message: 'Error processing print job', error: error.message }, { status: 500 });
   }
 }
