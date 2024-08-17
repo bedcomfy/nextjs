@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 
+export async function GET() {
+  return NextResponse.json({ message: 'Print API is ready to receive POST requests' });
+}
+
 export async function POST(request: Request) {
+  // Existing POST handler code remains unchanged
   const { upc } = await request.json();
   console.log('Received UPC:', upc);
 
