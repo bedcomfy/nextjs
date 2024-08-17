@@ -1,7 +1,6 @@
-import { NextResponse } from 'next/server';
-
 export async function POST(request: Request) {
   const { upc } = await request.json();
+  console.log('Received UPC:', upc);
 
   const cpclData = `
 ! 0 200 200 600 1
@@ -22,17 +21,23 @@ FORM
 PRINT
 `;
 
-  const response = await fetch('http://localhost:3001/print', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ cpclData }),
-  });
+  try {
+    const response = await fetch('http://localhost:3001/print', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ cpclData }),
+    });
 
-  if (response.ok) {
-    return NextResponse.json({ message: 'Print job sent' });
-  } else {
-    return NextResponse.json({ message: 'Failed to send print job' }, { status: 500 });
+    if (response.ok) {
+      return NextResponse.json({ message: 'Print job sent' });
+    } else {
+      console.error('Failed to send print job', response.statusText);
+      return NextResponse.json({ message: 'Failed to send print job' }, { status: 500 });
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return NextResponse.json({ message: 'Error sending print job' }, { status: 500 });
   }
 }
