@@ -5,7 +5,6 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  // Existing POST handler code remains unchanged
   const { upc } = await request.json();
   console.log('Received UPC:', upc);
 
@@ -40,11 +39,12 @@ PRINT
     if (response.ok) {
       return NextResponse.json({ message: 'Print job sent' });
     } else {
-      console.error('Failed to send print job', response.statusText);
-      return NextResponse.json({ message: 'Failed to send print job' }, { status: 500 });
+      const errorText = await response.text();
+      console.error('Error response from print server:', errorText);
+      return NextResponse.json({ message: 'Error sending print job', error: errorText }, { status: 500 });
     }
   } catch (error) {
-    console.error('Error:', error);
-    return NextResponse.json({ message: 'Error sending print job' }, { status: 500 });
+    console.error('Error sending print job:', error);
+    return NextResponse.json({ message: 'Error sending print job', error: error.message }, { status: 500 });
   }
 }
