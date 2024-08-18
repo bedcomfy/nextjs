@@ -13,7 +13,6 @@ const nextConfig = withTranspileModules({
       };
     }
 
-    // Consolidate rules into a single push statement
     config.module.rules.push(
       {
         test: /\.node$/,
