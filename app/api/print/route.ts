@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import usb from 'usb';
+import type { OutEndpoint } from 'usb';
 
-const ZEBRA_VENDOR_ID = 0x0a5f; // Replace with the actual vendor ID for Zebra
-const ZQ630_PRODUCT_ID = 0x0123; // Replace with the actual product ID for ZQ630
+const ZEBRA_VENDOR_ID = 0x0A5F; // Replace with the actual vendor ID for Zebra
+const ZQ630_PRODUCT_ID = 0x014E; // Replace with the actual product ID for ZQ630
 
 export async function POST(request: Request) {
   const { upc, printMethod } = await request.json();
@@ -31,7 +31,7 @@ PRINT
   try {
     if (printMethod === 'usb') {
       const usb = await import('usb');
-      const printer = usb.findByIds(0x1234, 0x5678); // Replace with your printer's vendorId and productId
+      const printer = usb.findByIds(ZEBRA_VENDOR_ID, ZQ630_PRODUCT_ID);
 
       if (!printer) {
         throw new Error('Printer not found');
@@ -43,9 +43,9 @@ PRINT
         throw new Error('No interfaces found on the printer');
       }
 
-      const iface: Interface = printer.interfaces[0];
+      const iface = printer.interfaces[0];
       iface.claim();
-      const outEndpoint: OutEndpoint = iface.endpoints.find(
+      const outEndpoint = iface.endpoints.find(
         (e) => e.direction === 'out'
       ) as OutEndpoint;
 
@@ -64,7 +64,6 @@ PRINT
       printer.close();
       return NextResponse.json({ message: 'Printer interaction successful' });
     } else if (printMethod === 'bluetooth') {
-      const noble = await import('noble');
       // Implement Bluetooth printing logic here
       return NextResponse.json({ message: 'Bluetooth printer interaction successful' });
     } else {
@@ -78,10 +77,17 @@ PRINT
 }
 
 export async function GET() {
-  const printer = usb.findByIds(ZEBRA_VENDOR_ID, ZQ630_PRODUCT_ID);
-  if (printer) {
-    return NextResponse.json({ message: 'Zebra ZQ630 printer is connected via USB.' });
-  } else {
-    return NextResponse.json({ message: 'Zebra ZQ630 printer is not connected via USB.' }, { status: 404 });
+  try {
+    const usb = await import('usb');
+    const printer = usb.findByIds(ZEBRA_VENDOR_ID, ZQ630_PRODUCT_ID);
+    if (printer) {
+      return NextResponse.json({ message: 'Zebra ZQ630 printer is connected via USB.' });
+    } else {
+      return NextResponse.json({ message: 'Zebra ZQ630 printer is not connected via USB.' }, { status: 404 });
+    }
+  } catch (error) {
+    console.error('Error checking printer connection:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ message: 'Error checking printer connection', error: errorMessage }, { status: 500 });
   }
 }

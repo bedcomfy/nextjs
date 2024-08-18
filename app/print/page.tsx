@@ -1,18 +1,23 @@
 'use client';
 import { useState } from 'react';
-import usb from 'usb';
 
 export default function PrintPage() {
   const [upc, setUpc] = useState('');
   const [printMethod, setPrintMethod] = useState('wifi'); // Default to WiFi
   const [printerConnected, setPrinterConnected] = useState(false);
 
-  const ZEBRA_VENDOR_ID = 0x0A5F; // Replace with the actual vendor ID for Zebra
-  const ZQ630_PRODUCT_ID = 0x014E; // Replace with the actual product ID for ZQ630
-
-  const checkPrinterConnection = () => {
-    const printer = usb.findByIds(ZEBRA_VENDOR_ID, ZQ630_PRODUCT_ID);
-    setPrinterConnected(printer !== undefined);
+  const checkPrinterConnection = async () => {
+    try {
+      const response = await fetch('/api/print', {
+        method: 'GET',
+      });
+      const result = await response.json();
+      setPrinterConnected(response.ok);
+      alert(result.message);
+    } catch (error) {
+      console.error('Error checking printer connection:', error);
+      alert('Error checking printer connection');
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
