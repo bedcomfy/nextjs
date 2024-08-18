@@ -1,4 +1,4 @@
-import withTM from 'next-transpile-modules';
+const withTM = require('next-transpile-modules')(['usb']);
 
 const withTranspileModules = withTM(['usb']);
 
