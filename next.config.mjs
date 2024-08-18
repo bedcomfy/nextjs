@@ -11,6 +11,13 @@ const nextConfig = {
         noble: false,
       };
     }
+
+    // Add a rule to ignore .node files
+    config.module.rules.push({
+      test: /\.node$/,
+      use: 'ignore-loader'
+    });
+
     return config;
   },
 };
