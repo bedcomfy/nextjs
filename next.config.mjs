@@ -1,8 +1,11 @@
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
+import withTM from 'next-transpile-modules';
+
+const withTranspileModules = withTM(['usb']);
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig = withTranspileModules({
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -20,6 +23,6 @@ const nextConfig = {
 
     return config;
   },
-};
+});
 
 export default nextConfig;
