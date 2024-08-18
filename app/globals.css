@@ -58,3 +58,23 @@ a:hover {
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+input, select, textarea, button {
+  color: rgb(var(--foreground-rgb));
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 1em;
+}
+
+input:focus, select:focus, textarea:focus, button:focus {
+  outline: none;
+  border-color: #0070f3;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5em;
+  color: rgb(var(--foreground-rgb));
+}

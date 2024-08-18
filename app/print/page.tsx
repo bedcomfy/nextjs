@@ -21,7 +21,8 @@ export default function PrintPage() {
   };
 
   return (
-    <div>
+    <div className="container">
+      <h1>Print Page</h1>
       <form onSubmit={handleSubmit}>
         <label htmlFor="upc">Enter UPC:</label>
         <input
