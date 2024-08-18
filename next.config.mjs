@@ -1,5 +1,3 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
 import withTM from 'next-transpile-modules';
 
 const withTranspileModules = withTM(['usb']);
@@ -15,27 +13,25 @@ const nextConfig = withTranspileModules({
       };
     }
 
-    // Add a rule to ignore .node files
-    config.module.rules.push({
-      test: /\.node$/,
-      use: 'ignore-loader'
-    });
-
-    // Add rules to handle CSS files
-    config.module.rules.push({
-      test: /\.css$/,
-      use: [
-        'style-loader',
-        'css-loader',
-        'postcss-loader',
-      ],
-    });
-
-    // Add any additional webpack configurations here
-    config.module.rules.push({
-      test: /\.example$/,
-      use: 'example-loader',
-    });
+    // Consolidate rules into a single push statement
+    config.module.rules.push(
+      {
+        test: /\.node$/,
+        use: 'ignore-loader'
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          'postcss-loader',
+        ],
+      },
+      {
+        test: /\.example$/,
+        use: 'example-loader',
+      }
+    );
 
     return config;
   },

@@ -28,7 +28,7 @@ export default function PrintPage() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ upc, printMethod }), // Include printMethod in the request body
+      body: JSON.stringify({ upc, printMethod }),
     });
 
     const result = await response.json();
