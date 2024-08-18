@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
-import { Interface, OutEndpoint } from 'usb';
+import usb from 'usb';
 
-export async function GET() {
-  return NextResponse.json({ message: 'Print API is ready to receive POST requests' });
-}
+const ZEBRA_VENDOR_ID = 0x0a5f; // Replace with the actual vendor ID for Zebra
+const ZQ630_PRODUCT_ID = 0x0123; // Replace with the actual product ID for ZQ630
 
 export async function POST(request: Request) {
   const { upc, printMethod } = await request.json();
@@ -30,25 +29,7 @@ PRINT
 `);
 
   try {
-    if (printMethod === 'wifi') {
-      const response = await fetch('http://localhost:3001/print', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ cpclData: cpclData.toString() }),
-      });
-
-      if (response.ok) {
-        const responseBody = await response.text();
-        console.log('Print server response:', responseBody);
-        return NextResponse.json({ message: 'Print job sent via WiFi' });
-      } else {
-        const errorText = await response.text();
-        console.error('Error response from print server:', errorText);
-        return NextResponse.json({ message: 'Error sending print job via WiFi', error: errorText }, { status: 500 });
-      }
-    } else if (printMethod === 'usb') {
+    if (printMethod === 'usb') {
       const usb = await import('usb');
       const printer = usb.findByIds(0x1234, 0x5678); // Replace with your printer's vendorId and productId
 
@@ -93,5 +74,14 @@ PRINT
     console.error('Error processing print job:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ message: 'Error processing print job', error: errorMessage }, { status: 500 });
+  }
+}
+
+export async function GET() {
+  const printer = usb.findByIds(ZEBRA_VENDOR_ID, ZQ630_PRODUCT_ID);
+  if (printer) {
+    return NextResponse.json({ message: 'Zebra ZQ630 printer is connected via USB.' });
+  } else {
+    return NextResponse.json({ message: 'Zebra ZQ630 printer is not connected via USB.' }, { status: 404 });
   }
 }
