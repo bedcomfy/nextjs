@@ -21,6 +21,16 @@ const nextConfig = withTranspileModules({
       use: 'ignore-loader'
     });
 
+    // Add rules to handle CSS files
+    config.module.rules.push({
+      test: /\.css$/,
+      use: [
+        'style-loader',
+        'css-loader',
+        'postcss-loader',
+      ],
+    });
+
     return config;
   },
 });
