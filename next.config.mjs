@@ -31,6 +31,12 @@ const nextConfig = withTranspileModules({
       ],
     });
 
+    // Add any additional webpack configurations here
+    config.module.rules.push({
+      test: /\.example$/,
+      use: 'example-loader',
+    });
+
     return config;
   },
 });
